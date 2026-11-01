@@ -8,6 +8,7 @@ import { Mark } from "./Mark";
 import { navigate } from "./router";
 import { Sheet } from "./Sheet";
 import { TabBar } from "./TabBar";
+import { ticketLead, ticketTitle } from "./Ticket";
 
 /** shown：流水是底下那一屏（上面可能盖着交易详情）；active：没被盖住；search：地址是 /journal 时的查询串。 */
 export function Journal({ shown, active, search, onToast }: { shown: boolean; active: boolean; search: string | null; onToast: (msg: string) => void }) {
@@ -51,9 +52,10 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
               <span className="row-text">
                 <span className="row-title">
                   {t.flag === "!" && <span className="flag">待确认</span>}
-                  {title(t)}
+                  {t.ticket?.refund && <span className="refund-tag">退</span>}
+                  {t.ticket ? ticketTitle(t.ticket) : title(t)}
                 </span>
-                <span className="row-sub">{subtitle(t)}</span>
+                <span className="row-sub">{t.ticket ? subtitle(t, ticketLead(t.ticket)) : subtitle(t)}</span>
               </span>
               <span className={`num amount tone-${amt.tone}`}>{amt.text}</span>
             </a>

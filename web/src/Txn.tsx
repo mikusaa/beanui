@@ -4,6 +4,7 @@ import { directiveCopyText, directiveFacts, directiveView, TypeTile } from "./Di
 import { money, shortDate, txnAmount, weekday } from "./format";
 import { CategoryTile, Icon, categoryStyle } from "./icons";
 import { Mark } from "./Mark";
+import { TicketCard } from "./Ticket";
 import { goBack, navigate } from "./router";
 import { useDataVersion } from "./sync";
 
@@ -181,29 +182,49 @@ export function Txn({ id, currency }: { id: string; currency: string }) {
         )}
         {txn && amt && (
           <>
-            <section className="hero">
-              <span className="hero-mark">
-                <Mark brand={txn.brand} fallback={txn.payee || txn.narration} size={56} radius={17} fontSize={22} />
-                <CategoryTile account={cat?.account} size={26} radius={13} iconSize={14} stroke={2.4} className="badge hero-badge" />
-              </span>
-              <span className="hero-payee">{txn.payee || txn.narration || "（无摘要）"}</span>
-              {txn.payee && txn.narration && <span className="hero-narration">{txn.narration}</span>}
-              <span className={`num hero-amount tone-${amt.tone}`}>{amt.text}</span>
-              <span className="pills">
-                <span className="pill pill-cat" style={{ ["--c" as string]: categoryStyle(cat?.account).color }}>
-                  <Icon name={categoryStyle(cat?.account).icon} size={12} stroke={2.4} />
-                  {cat?.name ?? "转账"}
-                </span>
-                <span className="pill num">
-                  {txn.date} {weekday(txn.date)}
-                </span>
-                {txn.tags.map((tag) => (
-                  <span key={tag} className="pill pill-tag">
-                    #{tag}
+            {txn.ticket ? (
+              <section className="hero-ticket">
+                <TicketCard t={txn} ticket={txn.ticket} currency={currency} />
+                <span className="pills">
+                  <span className="pill pill-cat" style={{ ["--c" as string]: categoryStyle(cat?.account).color }}>
+                    <Icon name={categoryStyle(cat?.account).icon} size={12} stroke={2.4} />
+                    {cat?.name ?? "转账"}
                   </span>
-                ))}
-              </span>
-            </section>
+                  <span className="pill num">
+                    {shortDate(txn.date)} {txn.ticket.refund ? "退" : "购"}
+                  </span>
+                  {txn.tags.map((tag) => (
+                    <span key={tag} className="pill pill-tag">
+                      #{tag}
+                    </span>
+                  ))}
+                </span>
+              </section>
+            ) : (
+              <section className="hero">
+                <span className="hero-mark">
+                  <Mark brand={txn.brand} fallback={txn.payee || txn.narration} size={56} radius={17} fontSize={22} />
+                  <CategoryTile account={cat?.account} size={26} radius={13} iconSize={14} stroke={2.4} className="badge hero-badge" />
+                </span>
+                <span className="hero-payee">{txn.payee || txn.narration || "（无摘要）"}</span>
+                {txn.payee && txn.narration && <span className="hero-narration">{txn.narration}</span>}
+                <span className={`num hero-amount tone-${amt.tone}`}>{amt.text}</span>
+                <span className="pills">
+                  <span className="pill pill-cat" style={{ ["--c" as string]: categoryStyle(cat?.account).color }}>
+                    <Icon name={categoryStyle(cat?.account).icon} size={12} stroke={2.4} />
+                    {cat?.name ?? "转账"}
+                  </span>
+                  <span className="pill num">
+                    {txn.date} {weekday(txn.date)}
+                  </span>
+                  {txn.tags.map((tag) => (
+                    <span key={tag} className="pill pill-tag">
+                      #{tag}
+                    </span>
+                  ))}
+                </span>
+              </section>
+            )}
 
             <section className="card">
               <div className={"card-label" + (txn.balanced ? "" : " is-bad")}>分录 · {txn.balanced ? "已平衡" : "不平衡"}</div>

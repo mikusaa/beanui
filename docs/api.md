@@ -50,6 +50,10 @@
   每一页都带，当前筛选下没有时为 `null`。流水页把它显示成最上面一个默认收起的「预记」组。
   每笔交易的 `sources` / `targets` 是出钱和进钱的资金科目的显示名；`funds.sources` / `funds.targets` 是同样的科目，
   带上完整科目名和账户徽标（`{account, name, brand}`）。
+  交易写了车票元数据（写法见 README 的「车票」）时带 `ticket`，否则为 `null`：
+  `{train, from, to, depart, arrive, minutes, seat, tickets, fee, refund}`。`depart`、`arrive` 是 `YYYY-MM-DD HH:MM`，
+  只写了时刻的 `arrive` 补上日期（早于开车时间的算第二天）；`minutes` 是历时，没写 `arrive` 时它和 `arrive` 都是 `null`；
+  `tickets` 只在多于一张时有；`fee` 是两位小数的字符串；`refund` 为真表示退票（支出类交易金额为正，即退回的钱）。
 - `GET /api/txn/<id>`：流水里其他指令的 id 也用这个地址，返回同流水里那一项的字段加 `source`、`commit`。
   交易的是：分录、源文件和行号、最后一次提交、同收付方的其他交易
   （最多 5 条：已经发生的在前，新到旧；未来日期的在后，近到远；截断时先保证已经发生的）。

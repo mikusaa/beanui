@@ -8,6 +8,7 @@ import { dayTotal, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, queryTo
 import { Mark } from "./Mark";
 import { navigate } from "./router";
 import { Sheet } from "./Sheet";
+import { TicketCard, ticketLead, ticketTitle } from "./Ticket";
 import { commitTime, COPY_LABEL, copyText, useTxnDetail } from "./Txn";
 
 const txnPath = (id: string) => `/txn/${encodeURIComponent(id)}`;
@@ -35,7 +36,12 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
       <span className="desk-txn-text">
         <span className="desk-txn-title">
           {t.flag === "!" && <span className="flag">待确认</span>}
-          {t.payee && t.narration ? (
+          {t.ticket ? (
+            <>
+              {t.ticket.refund && <span className="refund-tag">退</span>}
+              {t.payee || t.brand?.name} <span className="desk-txn-narration">· {ticketTitle(t.ticket)}</span>
+            </>
+          ) : t.payee && t.narration ? (
             <>
               {t.payee} <span className="desk-txn-narration">· {t.narration}</span>
             </>
@@ -44,7 +50,15 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
           )}
         </span>
         <span className="desk-txn-sub">
-          <CategoryTag category={t.category} />
+          {t.ticket ? (
+            // 车票把分类换成开车时间，退票写退票费
+            <span className="desk-tag-cat num" style={{ ["--c" as string]: t.ticket.refund ? "var(--red)" : categoryStyle(t.category?.account).color }}>
+              {!t.ticket.refund && <Icon name="clock" size={13} stroke={2.2} />}
+              {ticketLead(t.ticket)}
+            </span>
+          ) : (
+            <CategoryTag category={t.category} />
+          )}
           <FundList t={t} />
         </span>
       </span>
@@ -151,25 +165,34 @@ function TxnPane({ id, currency, onClose, onPick }: { id: string; currency: stri
       )}
       {txn && amt && (
         <>
-          <div className="desk-pane-hero">
-            <div className="desk-pane-who">
-              <Mark brand={txn.brand} fallback={txn.payee || txn.narration} size={48} radius={14} fontSize={20} />
-              <span className="desk-pane-name">
-                <span className="desk-pane-payee">{txn.payee || txn.narration || "（无摘要）"}</span>
-                <span className="num desk-pane-date">
-                  {txn.date} {weekday(txn.date)} · {txn.flag === "!" ? "待确认" : "已确认"} <span className="mono">{txn.flag}</span>
+          {txn.ticket ? (
+            <div className="desk-pane-hero">
+              <TicketCard t={txn} ticket={txn.ticket} currency={currency} />
+              <span className="num desk-pane-date">
+                {txn.date} {weekday(txn.date)} {txn.ticket.refund ? "退票" : "购票"} · {txn.flag === "!" ? "待确认" : "已确认"} <span className="mono">{txn.flag}</span>
+              </span>
+            </div>
+          ) : (
+            <div className="desk-pane-hero">
+              <div className="desk-pane-who">
+                <Mark brand={txn.brand} fallback={txn.payee || txn.narration} size={48} radius={14} fontSize={20} />
+                <span className="desk-pane-name">
+                  <span className="desk-pane-payee">{txn.payee || txn.narration || "（无摘要）"}</span>
+                  <span className="num desk-pane-date">
+                    {txn.date} {weekday(txn.date)} · {txn.flag === "!" ? "待确认" : "已确认"} <span className="mono">{txn.flag}</span>
+                  </span>
+                </span>
+              </div>
+              {txn.payee && txn.narration && <span className="desk-pane-narration">{txn.narration}</span>}
+              <span className="desk-pane-amount-line">
+                <span className={`num desk-pane-amount tone-${amt.tone}`}>{amt.text}</span>
+                <span className="pill pill-cat" style={{ ["--c" as string]: categoryStyle(cat?.account).color }}>
+                  <Icon name={categoryStyle(cat?.account).icon} size={14} stroke={2.2} />
+                  {cat?.name ?? "转账"}
                 </span>
               </span>
             </div>
-            {txn.payee && txn.narration && <span className="desk-pane-narration">{txn.narration}</span>}
-            <span className="desk-pane-amount-line">
-              <span className={`num desk-pane-amount tone-${amt.tone}`}>{amt.text}</span>
-              <span className="pill pill-cat" style={{ ["--c" as string]: categoryStyle(cat?.account).color }}>
-                <Icon name={categoryStyle(cat?.account).icon} size={14} stroke={2.2} />
-                {cat?.name ?? "转账"}
-              </span>
-            </span>
-          </div>
+          )}
 
           <div className="desk-pane-postings">
             <span className={"card-label" + (txn.balanced ? "" : " is-bad")}>分录 · {txn.balanced ? "已平衡" : "不平衡"}</span>

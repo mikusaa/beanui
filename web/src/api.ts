@@ -21,6 +21,21 @@ export type TxnSummary = {
   targets: string[];
   funds: { sources: Fund[]; targets: Fund[] };
   brand: Brand | null;
+  ticket: Ticket | null;
+};
+
+/** 车票，取自交易的元数据。时间是「YYYY-MM-DD HH:MM」；refund：退票，金额是退回的钱；fee：退票或改签的手续费。 */
+export type Ticket = {
+  train: string;
+  from: string;
+  to: string;
+  depart: string;
+  arrive: string | null;
+  minutes: number | null;
+  seat: string | null;
+  tickets: number | null;
+  fee: string | null;
+  refund: boolean;
 };
 
 /** 流水里能显示的指令类型，次序同界面上的开关；open 含销户。 */

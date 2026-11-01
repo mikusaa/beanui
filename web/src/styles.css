@@ -905,6 +905,19 @@ button {
   vertical-align: 1px;
 }
 
+/* 流水里退票的标记，同「待确认」放在标题前面，标题太长被截断时也看得见 */
+.refund-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: var(--bad-bg);
+  color: var(--bad-fg);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: 1px;
+}
+
 .amount {
   font-weight: 600;
   white-space: nowrap;
@@ -1108,6 +1121,229 @@ button {
   border: 0;
   background: var(--tag-bg);
   color: var(--tag-fg);
+}
+
+/* 车票，对应画布 Phone-Txn-Rail / Desktop-Journal-Rail。两侧的半圆缺口填所在底色，详情栏里是白底 */
+.hero-ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ticket {
+  --notch: var(--bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.desk-pane .ticket {
+  --notch: var(--surface);
+  padding: 12px 14px;
+  border-radius: 16px;
+}
+
+.ticket-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted-2);
+}
+
+.ticket-payee {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.ticket-day {
+  margin-left: auto;
+}
+
+.ticket-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ticket-end {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ticket-end.is-to {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.ticket-station {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+/* 详情栏窄（1280 宽时票面不到 260px），站名和箭头都收小，四个字的站名放得下一行 */
+.desk-pane .ticket-station {
+  font-size: 18px;
+}
+
+.ticket-arrow {
+  width: 64px;
+  height: 8px;
+}
+
+.desk-pane .ticket-arrow {
+  width: 40px;
+}
+
+.ticket-time {
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ticket-train {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding-bottom: 2px;
+  color: var(--muted-2);
+}
+
+.ticket-train .ticket-time {
+  font-size: 11px;
+  color: var(--muted-2);
+}
+
+.ticket-no {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.is-refund .ticket-station {
+  color: var(--muted-2);
+  text-decoration: line-through;
+}
+
+.is-refund .ticket-no {
+  color: var(--muted-2);
+}
+
+/* 盖在车次下面的箭头和历时上，不挡站名；不填底色，像印上去的章 */
+.ticket-stamp {
+  position: absolute;
+  top: 74px;
+  left: 50%;
+  padding: 2px 10px;
+  border: 2px solid var(--bad-dot);
+  border-radius: 8px;
+  color: var(--bad-dot);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  transform: translateX(-50%) rotate(-12deg);
+  pointer-events: none;
+}
+
+.desk-pane .ticket-stamp {
+  top: 68px;
+}
+
+.ticket-tear {
+  position: relative;
+  height: 18px;
+  margin: 12px -16px 10px;
+}
+
+.desk-pane .ticket-tear {
+  margin: 10px -14px 8px;
+}
+
+.ticket-tear::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 8px;
+  border-top: 1.5px dashed var(--dashed);
+}
+
+.ticket-tear::after {
+  content: "";
+  position: absolute;
+  /* 盖住卡片的左右边框，只画朝里的半圆 */
+  inset: 0 -1px;
+  background:
+    radial-gradient(circle at 1px 9px, var(--notch) 8px, var(--border) 8.5px, transparent 9.5px) left / 11px 18px no-repeat,
+    radial-gradient(circle at 10px 9px, var(--notch) 8px, var(--border) 8.5px, transparent 9.5px) right / 11px 18px no-repeat;
+}
+
+.ticket-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ticket-seat {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ticket-amount {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.desk-pane .ticket-amount {
+  font-size: 26px;
+}
+
+.ticket-fee {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  align-items: baseline;
+  font-size: 13px;
+}
+
+.ticket-fee dt {
+  color: var(--muted-2);
+}
+
+.ticket-fee dd {
+  margin: 0;
+  text-align: right;
+  color: var(--text-2);
+}
+
+.ticket-fee dd.is-fee {
+  color: var(--red);
+}
+
+.ticket-fee dt.is-back {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.ticket-fee dd.ticket-amount {
+  color: var(--green);
 }
 
 .txn-body .card {

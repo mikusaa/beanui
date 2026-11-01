@@ -27,6 +27,8 @@ const PATHS = {
   note: "M5 4h14v12l-4 4H5zM15 20v-4h4M9 9h6M9 13h4",
   chart: "M3 17l6-6 4 4 8-8M15 7h6v6",
   file: "M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5",
+  // 车票的开车时间
+  clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2",
 };
 
 export type IconName = keyof typeof PATHS;

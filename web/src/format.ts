@@ -48,13 +48,16 @@ export function title(t: Pick<TxnSummary, "payee" | "narration">): string {
   return [t.payee, t.narration].filter(Boolean).join(" · ") || "（无摘要）";
 }
 
-/** 「分类 · 资金流向 · #标签」 */
-export function subtitle(t: TxnSummary): string {
-  const flow =
-    t.sources.length && t.targets.length && t.kind !== "income"
-      ? `${t.sources.join("、")} → ${t.targets.join("、")}`
-      : (t.kind === "income" ? t.targets : t.sources).join("、") || t.targets.join("、");
-  return [t.category?.name ?? "转账", flow, ...t.tags.map((x) => `#${x}`)].filter(Boolean).join(" · ");
+/** 资金流向：「出钱的 → 进钱的」，只有一边时只写那边。 */
+export function flow(t: TxnSummary): string {
+  return t.sources.length && t.targets.length && t.kind !== "income"
+    ? `${t.sources.join("、")} → ${t.targets.join("、")}`
+    : (t.kind === "income" ? t.targets : t.sources).join("、") || t.targets.join("、");
+}
+
+/** 「分类 · 资金流向 · #标签」；车票把分类换成开车时间（退票写退票费）。 */
+export function subtitle(t: TxnSummary, lead = t.category?.name ?? "转账"): string {
+  return [lead, flow(t), ...t.tags.map((x) => `#${x}`)].filter(Boolean).join(" · ");
 }
 
 const thisYear = new Date().getFullYear();
