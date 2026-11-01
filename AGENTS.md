@@ -1,6 +1,7 @@
 # beanui
 
 只读的 Beancount 网页界面。功能、配置、部署见 [README.md](README.md)，接口见 [docs/api.md](docs/api.md)。
+术语见 [GLOSSARY.md](GLOSSARY.md)，定下的取舍见 [docs/adr/](docs/adr/)，改口径前先看。
 
 ## 规矩
 
