@@ -1,6 +1,6 @@
 [project]
 name = "beanui"
-version = "0.0.1"
+version = "0.0.2"
 description = "手机优先的只读 Beancount 网页界面"
 license = "MIT"
 # 大版本跟着 beancount 3、beanquery 0.2 走：bean-check 能过的账本，界面一定能加载
