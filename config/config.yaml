@@ -1,0 +1,37 @@
+# 账本约定。下面写的都是默认值（注释掉的就是不写时的样子），照自己账本的科目改：
+# 在自己的配置目录（$CONFIG_DIR）里放一份 config.yaml，只写要改的项。
+
+# 账户页的分组：科目第二段 → 分组名。single: true 时组里每个账户单列，否则按前三段归并
+# （信用卡按银行、投资按品种、钱包按平台）。按这里的顺序排，没写的组排在后面、显示英文末段；
+# 分组账户（如 Assets:Bank）的 open 上写了 name: 时以它为准。写了 Assets 或 Liabilities 就整张替换。
+# groups:
+#   Assets:
+#     Bank: { name: 银行, single: true }
+#     Cash: 现金
+#     Investments: 投资
+#     Digital: 数字钱包
+#     Receivables: 应收
+#     Prepaid: 预付
+#   Liabilities:
+#     CreditCard: 信用卡
+#     Payables: 应付
+#     Credit: 消费信贷
+#     Installment: { name: 分期, single: true }
+
+# 信用卡科目根。下面一段是银行代码，同一家银行的卡合并算额度；额度写在银行账户的 open 上：
+# credit-limit（共享额度）、card-count（卡数）、bank-name（显示名）。
+# credit_card: Liabilities:CreditCard
+
+# 银行代码 → 显示名，在默认表上增改。银行账户上写了 bank-name: 时以它为准。
+# banks:
+#   ABC: 农业银行
+#   BOC: 中国银行
+#   CCB: 建设银行
+#   CITIC: 中信银行
+#   CMB: 招商银行
+#   ICBC: 工商银行
+#   SPDB: 浦发银行
+
+# 代管：第二段是它的科目是替别人管的钱（Assets:Custody:<人> 和 Liabilities:Custody:<人> 成对），
+# 不计入资产、负债两边，按人单独列一张卡。写 null 就当普通科目。
+# custody: Custody

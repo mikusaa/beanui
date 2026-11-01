@@ -1,0 +1,37 @@
+; 账户页用的期初余额和持仓，都是转账，不影响首页的收支
+2026-07-01 * "" "期初余额"
+  Assets:Bank:BOC:8765                                       5000.00 CNY
+  Assets:Digital:Alipay                                       100.00 CNY
+  Equity:Opening-Balances
+
+2026-07-05 * "" "买黄金"
+  Assets:Investments:Gold:Bank                                    10 GOLD {500.00 CNY}
+  Assets:Bank:CMB:1234                                      -5000.00 CNY
+
+; 没有 USDC 的价格，账户页不换算
+2026-07-10 * "" "朋友转来 USDC"
+  Assets:Investments:Crypto:Exchange                           20.00 USDC
+  Equity:Opening-Balances
+
+2026-07-15 * "" "借给朋友"
+  Assets:Receivables:Friends                                  800.00 CNY
+  Assets:Bank:CMB:1234                                       -800.00 CNY
+
+2026-07-20 * "" "家里转来"
+  Liabilities:Payables:Family                                -600.00 CNY
+  Assets:Bank:BOC:8765                                        600.00 CNY
+
+; 替小明管的钱：资产、负债两边相等，不计入两边的合计
+2026-07-25 * "" "小明转来理财"
+  Assets:Bank:BOC:8765                                       3000.00 CNY
+  Liabilities:Custody:Xiaoming                              -3000.00 CNY
+
+2026-07-25 * "" "替小明买余额宝"
+  Assets:Custody:Xiaoming:Alipay                             3000.00 CNY
+  Assets:Bank:BOC:8765                                      -3000.00 CNY
+
+2026-07-05 price GOLD                                         500.00 CNY
+2026-09-30 price GOLD                                         520.00 CNY
+2026-10-30 price GOLD                                         530.00 CNY
+; 未来日期的价格不用
+2026-11-15 price GOLD                                         600.00 CNY

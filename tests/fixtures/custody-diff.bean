@@ -1,0 +1,11 @@
+; 代管两边不相等的情况，测试时追加到虚构账本：外公的利息只记了资产一边
+2020-01-01 open Assets:Custody:Grandpa:Bank
+2020-01-01 open Liabilities:Custody:Grandpa
+
+2026-10-01 * "" "外公转来"
+  Assets:Custody:Grandpa:Bank                                1000.00 CNY
+  Liabilities:Custody:Grandpa                               -1000.00 CNY
+
+2026-10-15 * "" "外公的利息"
+  Assets:Custody:Grandpa:Bank                                   5.00 CNY
+  Equity:Opening-Balances

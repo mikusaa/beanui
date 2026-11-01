@@ -1,0 +1,6 @@
+; 测试用的虚构账本，数据均为编造
+option "title" "示例账本"
+option "operating_currency" "CNY"
+
+include "accounts.bean"
+include "data/*.bean"

@@ -1,0 +1,12 @@
+# 只放镜像用得到的：先全部排除，再挑回来。node_modules、.venv、tests、.claude、local 都不进构建上下文
+*
+!pyproject.toml
+!uv.lock
+!beanui/
+!config/config.yaml
+!config/brands.yaml
+!web/
+web/node_modules/
+web/dist/
+**/__pycache__/
+**/.DS_Store

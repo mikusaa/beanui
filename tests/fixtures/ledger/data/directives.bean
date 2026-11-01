@@ -1,0 +1,8 @@
+; 流水里交易以外的指令，数据均为编造
+2020-01-01 commodity GOLD
+  name: "积存金"
+
+2026-10-01 balance Assets:Digital:Alipay                 100.00 CNY
+2026-10-15 document Assets:Bank:CMB:1234 "../docs/receipt.txt"
+2026-10-20 note Assets:Digital:Alipay "花呗额度调到 5000"
+2026-10-31 balance Assets:Bank:CMB:1234                 8101.00 CNY

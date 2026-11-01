@@ -1,0 +1,43 @@
+; 收支表用的几种情况，测试时追加到虚构账本：二级父科目带 name:、记在二级科目本身的支出、四段的收入科目、
+; 去年同期的收支，以及记在转账里的投资收益（和首页口径一致，不算收入）
+2020-01-01 open Expenses:Food
+  name: "饮食"
+2020-01-01 open Expenses:Hobbies
+2020-01-01 open Income:Investments:CapitalGains
+  name: "资本利得"
+2020-01-01 open Income:Financial:Interest:CMB
+2020-01-01 open Assets:Investments:Fund
+
+2025-03-10 * "示例公司" "去年工资"
+  Assets:Bank:CMB:1234                                      10000.00 CNY
+  Income:Salary
+
+2025-05-01 * "美团外卖" "去年的饭"
+  Assets:Digital:Alipay                                       -36.40 CNY
+  Expenses:Food:Meals                                          36.40 CNY
+
+2025-12-20 * "" "年底的模型"
+  Assets:Digital:Alipay                                       -60.00 CNY
+  Expenses:Hobbies                                             60.00 CNY
+
+2026-04-02 * "" "卖基金"
+  Assets:Investments:Fund                                   -1000.00 CNY
+  Income:Investments:CapitalGains                            -100.00 CNY
+  Assets:Bank:CMB:1234                                       1100.00 CNY
+
+2026-05-20 * "" "基金分红"
+  Assets:Bank:CMB:1234                                         50.00 CNY
+  Income:Investments:CapitalGains
+
+2026-06-30 * "招商银行" "利息"
+  Assets:Bank:CMB:1234                                          3.21 CNY
+  Income:Financial:Interest:CMB
+
+2026-06-01 * "" "模型"
+  Assets:Digital:Alipay                                       -88.00 CNY
+  Expenses:Hobbies                                             88.00 CNY
+
+2026-06-02 * "" "饭和饮料"
+  Assets:Digital:Alipay                                       -32.00 CNY
+  Expenses:Food                                                12.00 CNY
+  Expenses:Food:Meals                                          20.00 CNY

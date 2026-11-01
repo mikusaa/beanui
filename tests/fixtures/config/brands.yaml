@@ -1,0 +1,17 @@
+# 测试用的品牌表，规则同 config/brands.yaml
+payments:
+  - { id: alipay, name: 支付宝, aliases: [花呗] }
+  - { id: jdfinance, name: 京东白条, aliases: [白条, 京东金融] }
+  - { id: boc, name: 中国银行, aliases: [中行] }
+  - { id: cmb, name: 招商银行, aliases: [招行] }
+shopping:
+  - { id: jd, name: 京东, aliases: [京东外卖] }
+  - { id: taobao, name: 淘宝, aliases: [] }
+  - { id: meituan, name: 美团, aliases: [] }
+  - { id: meituanwaimai, name: 美团外卖, aliases: [] }
+  - { id: appstore, name: App Store, aliases: [Apple App Store] }
+  - { id: google, name: Google, aliases: [谷歌] }
+  - { id: adsense, name: Google AdSense, aliases: [] }
+games:
+  - { id: genshin, name: 原神, aliases: [Genshin] }
+  - { id: tencentcloud, name: 腾讯云, aliases: [] }

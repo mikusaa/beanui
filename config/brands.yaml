@@ -1,0 +1,53 @@
+# 收付方 → 品牌。界面按 aliases 匹配收付方（为空时匹配摘要），图标在 logos/<id>.png 或 .svg。
+# 匹配前去空格、全角转半角、忽略大小写和括号，取命中最长的别名。
+# 这是一份常见品牌的示例表，照自己的账本增删：在自己的配置目录（$CONFIG_DIR）里放一份 brands.yaml。
+# 图标不随仓库发布，用 scripts/fetch_logos.py 按下面的来源抓到 logos/；每个品牌写一种来源：
+#   vcards      metowolf/vCards 里 data/ 下的路径（不带 .png）
+#   appstore    App Store 搜索词（store 默认 cn），抓到的 app_id 记在 logos/sources.json
+#   simpleicons Simple Icons 的 slug
+#   想用别的图时直接放进 logos/<id>.png，并在 sources.json 里把它标成 source: manual
+#   三种都不写的品牌没有图标，界面显示首字
+# 银行和钱包账户在 open 指令上写 brand: "<id>"，不靠文字匹配；科目里有一段恰好是品牌 id
+# （不分大小写，如 Assets:Bank:CMB → cmb）时不写也行。交易上写 brand: 直接指定品牌，写 game: 时按游戏名匹配。
+
+banks:
+  - { id: abc, name: 中国农业银行, aliases: [农业银行, 农行], vcards: 金融银行/中国农业银行 }
+  - { id: boc, name: 中国银行, aliases: [中行], vcards: 金融银行/中国银行 }
+  - { id: ccb, name: 中国建设银行, aliases: [建设银行, 建行], vcards: 金融银行/中国建设银行 }
+  - { id: icbc, name: 中国工商银行, aliases: [工商银行, 工行], vcards: 金融银行/中国工商银行 }
+  - { id: cmb, name: 招商银行, aliases: [招行], vcards: 金融银行/招商银行 }
+  - { id: citic, name: 中信银行, aliases: [中信], vcards: 金融银行/中信银行 }
+  - { id: spdb, name: 浦发银行, aliases: [浦发], vcards: 金融银行/浦发银行 }
+  - { id: mybank, name: 网商银行, aliases: [], appstore: 网商银行 }
+
+payments:
+  - { id: alipay, name: 支付宝, aliases: [余额宝, 花呗], vcards: 电商购物/支付宝 }
+  - { id: wechat, name: 微信, aliases: [微信支付], vcards: 电商购物/微信支付 }
+  - { id: dcep, name: 数字人民币, aliases: [], appstore: 数字人民币 }
+  - { id: jdfinance, name: 京东白条, aliases: [白条, 京东金融], appstore: 京东金融 }
+  - { id: applepay, name: Apple Pay, aliases: [], simpleicons: applepay }
+
+shopping:
+  - { id: jd, name: 京东, aliases: [京东外卖, 京东快递], vcards: 电商购物/京东 }
+  - { id: taobao, name: 淘宝, aliases: [淘宝闪购], vcards: 电商购物/淘宝 }
+  - { id: pdd, name: 拼多多, aliases: [拼单], vcards: 电商购物/拼多多 }
+  - { id: meituan, name: 美团, aliases: [], vcards: 本地生活/美团 }
+  # 「美团外卖」比「美团」长，按最长匹配归这里
+  - { id: meituanwaimai, name: 美团外卖, aliases: [], vcards: 外卖订餐/美团外卖 }
+  - { id: hema, name: 盒马, aliases: [盒马鲜生], vcards: 外卖订餐/盒马鲜生 }
+
+transport:
+  - { id: didi, name: 滴滴出行, aliases: [滴滴], vcards: 租车代驾/滴滴出行 }
+  # id 不能是纯数字；别名 "12306" 要加引号，否则 YAML 读成数字
+  - { id: rail12306, name: 铁路12306, aliases: ["12306", 中国铁路], vcards: 出行购票/中国铁路 }
+
+services:
+  - { id: cmcc, name: 中国移动, aliases: [移动], vcards: 通讯服务/中国移动 }
+  - { id: telecom, name: 中国电信, aliases: [电信], vcards: 通讯服务/中国电信 }
+  - { id: apple, name: Apple, aliases: [Apple Store], vcards: 其它/Apple }
+  - { id: appstore, name: App Store, aliases: [Apple App Store, AppStore], simpleicons: appstore }
+  - { id: google, name: Google, aliases: [谷歌], vcards: 互联网/Google }
+  - { id: tencentcloud, name: 腾讯云, aliases: [], vcards: 云服务/腾讯云 }
+
+games:
+  - { id: steam, name: Steam, aliases: [], vcards: 影音娱乐/Steam }

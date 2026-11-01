@@ -1,0 +1,36 @@
+[project]
+name = "beanui"
+version = "0.0.1"
+description = "手机优先的只读 Beancount 网页界面"
+license = "MIT"
+# 大版本跟着 beancount 3、beanquery 0.2 走：bean-check 能过的账本，界面一定能加载
+requires-python = ">=3.14"
+dependencies = [
+    "beancount>=3.2.0,<4",
+    "beanquery>=0.2.0,<0.3",
+    "fastapi>=0.162.0",
+    "pyyaml>=6.0.3",
+    "uvicorn>=0.54.0",
+]
+
+[project.optional-dependencies]
+# 账本用到的第三方插件包放这里（内置的 beancount.plugins.* 不用加），
+# 然后 uv sync --extra plugins。Docker 镜像也按这一组安装。
+plugins = []
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pillow>=13.0.0",
+    "pytest>=9.2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["beanui"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

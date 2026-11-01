@@ -1,0 +1,64 @@
+2026-08-10 * "滴滴出行" "打车"
+  Liabilities:CreditCard:BOC:5678                           -2500.00 CNY
+  Expenses:Transport:Taxi                                    2500.00 CNY
+
+2026-08-12 * "中国电信" "宽带年费"
+  Liabilities:CreditCard:CMB:0001                           -4200.00 CNY
+  Expenses:Housing:Internet                                  4200.00 CNY
+
+2026-08-15 * "地铁" "交通卡充值"
+  Liabilities:CreditCard:ICBC:9999                           -100.00 CNY
+  Expenses:Transport:Public                                   100.00 CNY
+
+2026-09-15 * "京东" "无线鼠标"
+  Liabilities:Credit:Baitiao                                 -299.00 CNY
+  Expenses:Tech:Device                                        299.00 CNY
+
+2026-10-05 * "腾讯云" "充值"
+  Assets:Prepaid:TencentCloud                                   1.00 CNY
+  Assets:Digital:Alipay                                        -1.00 CNY
+
+2026-10-05 * "腾讯云" "充值"
+  Assets:Prepaid:TencentCloud                                   1.00 CNY
+  Assets:Digital:Alipay                                        -1.00 CNY
+
+2026-10-20 * "" "京东白条还款"
+  Liabilities:Credit:Baitiao                                  299.00 CNY
+  Assets:Bank:CMB:1234                                       -299.00 CNY
+
+2026-10-24 * "示例公司" "十月工资"
+  Assets:Bank:CMB:1234                                      14200.00 CNY
+  Income:Salary
+
+2026-10-28 * "淘宝" "内存条 DDR4" #Alipay
+  Liabilities:Credit:Huabei                                   -44.02 CNY
+  Income:Discount                                              -0.98 CNY
+  Expenses:Tech:Homelab                                        45.00 CNY
+
+2026-10-28 * "淘宝" "散热风扇" #Alipay
+  Liabilities:Credit:Huabei                                    -4.40 CNY
+  Income:Discount                                              -0.10 CNY
+  Expenses:Tech:Homelab                                         4.50 CNY
+
+2026-10-30 * "中国银行" "信用卡还款"
+  Liabilities:CreditCard:BOC:5678                            2000.00 CNY
+  Assets:Bank:BOC:8765                                      -1999.73 CNY
+  Income:Discount                                              -0.27 CNY
+
+2026-10-31 * "美团外卖" "牛肉饭"
+  Assets:Digital:Alipay                                       -18.20 CNY
+  Expenses:Food:Meals                                          18.20 CNY
+
+2026-10-31 * "米哈游" "月卡"
+  game: "Genshin"
+  Assets:Digital:Alipay                                       -30.00 CNY
+  Expenses:Entertainment:Gaming                               30.00 CNY
+
+; 预先记好的下月分期，首页和信用卡额度都不该算进去
+2026-11-15 * "招商银行" "宽带分期"
+  Liabilities:CreditCard:CMB:0001                            -300.00 CNY
+  Expenses:Housing:Internet                                   300.00 CNY
+
+2026-12-15 * "招商银行" "宽带分期"
+  Liabilities:CreditCard:CMB:0001                            -300.00 CNY
+  Expenses:Housing:Internet                                   300.00 CNY
