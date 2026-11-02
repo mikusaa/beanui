@@ -237,7 +237,9 @@ export function useJournal({
     if (key === "tag") return `#${v}`;
     if (key === "account" || key === "category") {
       // 从账户页点进来的可能是没记过账的父科目（如信用卡按银行合并），不在 accounts 里
-      return facets?.names[v] ?? v.split(":").pop()!;
+      const name = (a: string) => facets?.names[a] ?? a.split(":").pop()!;
+      // 分类面板只列到第三段，更深的（数码·设备·手机）带上上一级，免得只看到「手机」
+      return key === "category" && v.split(":").length > 3 ? `${name(v.split(":").slice(0, -1).join(":"))}·${name(v)}` : name(v);
     }
     return v;
   };
@@ -253,5 +255,5 @@ export function useJournal({
     setQuery((q) => ({ ...q, q: "" }));
   };
 
-  return { query, typed, setTyped, data, error, loadingMore, onScroll, sheet, setSheet, openSheet, options, chipLabel, pick, clearSearch, futureOpen, setFutureOpen, types, toggleType };
+  return { query, typed, setTyped, data, error, loadingMore, onScroll, sheet, setSheet, openSheet, facets, options, chipLabel, pick, clearSearch, futureOpen, setFutureOpen, types, toggleType };
 }

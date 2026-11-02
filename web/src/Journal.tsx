@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import type { Day, EntryType, TxnSummary } from "./api";
+import { CategorySheet } from "./CategorySheet";
 import { DirectiveRow } from "./Directive";
 import { dayLabel, money, subtitle, title, txnAmount } from "./format";
 import { CategoryTile } from "./icons";
@@ -14,7 +15,7 @@ import { ticketIcon, ticketLead, ticketTitle } from "./Ticket";
 export function Journal({ shown, active, search, onToast }: { shown: boolean; active: boolean; search: string | null; onToast: (msg: string) => void }) {
   const listRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const { query, typed, setTyped, data, error, loadingMore, onScroll, sheet, setSheet, openSheet, options, chipLabel, pick, futureOpen, setFutureOpen, types, toggleType } = useJournal({
+  const { query, typed, setTyped, data, error, loadingMore, onScroll, sheet, setSheet, openSheet, facets, options, chipLabel, pick, futureOpen, setFutureOpen, types, toggleType } = useJournal({
     search,
     active,
     onToast,
@@ -120,7 +121,11 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
       {typeSheet && (
         <Sheet title="类型" options={typeOptions(data?.types)} value="" values={types} clearable={false} onPick={(v) => toggleType(v as EntryType)} onClose={() => setTypeSheet(false)} />
       )}
-      {sheet && <Sheet title={FILTER_TITLES[sheet]} options={options(sheet)} value={query[sheet]} clearable={sheet !== "time"} onPick={(v) => pick(sheet, v)} onClose={() => setSheet(null)} />}
+      {sheet === "category" ? (
+        <CategorySheet facets={facets} value={query.category} onPick={(v) => pick("category", v)} onClose={() => setSheet(null)} />
+      ) : (
+        sheet && <Sheet title={FILTER_TITLES[sheet]} options={options(sheet)} value={query[sheet]} clearable={sheet !== "time"} onPick={(v) => pick(sheet, v)} onClose={() => setSheet(null)} />
+      )}
     </div>
   );
 }

@@ -18,6 +18,8 @@ const PATHS = {
   bank: "M3 10h18L12 4zM5 10v8M9 10v8M15 10v8M19 10v8M3 20h18",
   sub: "M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3",
   gear: "M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H4zM17 15h3v5h-3z",
+  coin: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM9.5 8h3.5a2 2 0 0 1 0 4H9.5zM9.5 12h4a2 2 0 0 1 0 4h-4zM9.5 8v8M11 6.5V8M11 16v1.5",
+  paw: "M7 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM10.5 7.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13.5 7.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM17 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM12 11.5c-3 0-5.5 3.3-5.5 5.8a2.4 2.4 0 0 0 3 2.3c1-.3 1.7-.4 2.5-.4s1.5.1 2.5.4a2.4 2.4 0 0 0 3-2.3c0-2.5-2.5-5.8-5.5-5.8z",
   other: "M5 12h.01M12 12h.01M19 12h.01",
   // 流水里交易以外的指令
   check: "M5 12l5 5 9-10",
@@ -55,6 +57,8 @@ const RULES: [string, IconName, string][] = [
   ["Expenses:Education", "book", "#026AA2"],
   ["Expenses:Social", "gift", "#C11574"],
   ["Expenses:Financial", "bank", "#475467"],
+  ["Expenses:Crypto", "coin", "#B54708"],
+  ["Expenses:Pet", "paw", "#4E5BA6"],
   ["Income", "pay", "#067647"],
   ["Income:Discount", "tag", "#067647"],
   ["Income:Cashback", "tag", "#067647"],

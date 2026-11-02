@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { ENTRY_TYPES, type Day, type TxnSummary } from "./api";
+import { CategorySheet } from "./CategorySheet";
 import { CategoryTag, DeskPage, FundList } from "./DeskPage";
 import { DeskDirectiveRow, directiveFacts, directiveView } from "./Directive";
 import { dayLabel, money, shortDate, txnAmount, weekday } from "./format";
@@ -267,7 +268,7 @@ export function DesktopJournal({
   currency: string;
 }) {
   const bodyRef = useRef<HTMLElement>(null);
-  const { query, data, error, loadingMore, onScroll, sheet, setSheet, openSheet, options, chipLabel, pick, clearSearch, futureOpen, setFutureOpen, types, toggleType } = useJournal({
+  const { query, data, error, loadingMore, onScroll, sheet, setSheet, openSheet, facets, options, chipLabel, pick, clearSearch, futureOpen, setFutureOpen, types, toggleType } = useJournal({
     search,
     active,
     onToast,
@@ -404,7 +405,11 @@ export function DesktopJournal({
         )}
       </div>
 
-      {sheet && <Sheet title={FILTER_TITLES[sheet]} options={options(sheet)} value={query[sheet]} clearable={sheet !== "time"} onPick={(v) => pick(sheet, v)} onClose={() => setSheet(null)} anchor={anchor} />}
+      {sheet === "category" ? (
+        <CategorySheet facets={facets} value={query.category} onPick={(v) => pick("category", v)} onClose={() => setSheet(null)} anchor={anchor} />
+      ) : (
+        sheet && <Sheet title={FILTER_TITLES[sheet]} options={options(sheet)} value={query[sheet]} clearable={sheet !== "time"} onPick={(v) => pick(sheet, v)} onClose={() => setSheet(null)} anchor={anchor} />
+      )}
     </DeskPage>
   );
 }

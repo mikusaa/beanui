@@ -1698,6 +1698,77 @@ button {
   color: var(--muted-2);
 }
 
+/* 流水的「分类」筛选：支出是四列图标格子，收入是文字按钮，选中大类的子类那排插在它下面 */
+.cat-sec {
+  margin: 8px 0 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted-2);
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.cat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 2px 6px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--text-2);
+}
+
+.cat-cell-name {
+  max-width: 100%;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-cell.is-on {
+  background: var(--bg);
+}
+
+.cat-cell.is-on .cat-tile {
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+.cat-cell.is-on .cat-cell-name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cat-pills,
+.cat-subs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cat-pills {
+  padding-bottom: 4px;
+}
+
+.cat-subs {
+  grid-column: 1 / -1;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.cat-subs .chip {
+  height: 30px;
+}
+
 .sheet-empty {
   padding: 24px 0;
   text-align: center;
@@ -2846,6 +2917,11 @@ i.chart-expense {
 .sheet-backdrop.is-pop .sheet-item {
   min-height: 38px;
   font-size: 13px;
+}
+
+.sheet-backdrop.is-pop .cat-sheet {
+  width: 360px;
+  max-height: min(600px, 80vh);
 }
 
 /* 预记：今天以后的交易收在流水最上面，默认收起；虚线框和下面已经发生的交易分开 */
