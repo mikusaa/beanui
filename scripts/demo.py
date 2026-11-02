@@ -131,6 +131,8 @@ ACCOUNTS = """\
   name: "人情"
 2020-01-01 open Expenses:Travel:Hotel
   name: "住宿"
+2020-01-01 open Expenses:Travel:Attractions
+  name: "门票"
 
 2020-01-01 open Equity:Opening-Balances
 
@@ -176,13 +178,16 @@ class Book:
         m = self.rng.randrange(lo * 60, hi * 60)
         return f"{m // 60:02d}:{m % 60:02d}"
 
-    def txn(self, d: date, payee: str, narration: str, postings: list, time: str | None = None, tags=()):
+    def txn(self, d: date, payee: str, narration: str, postings: list, time: str | None = None, tags=(), meta: dict | None = None):
         """postings：(科目, 金额[, 单位, 成本])，最后一条可以只写科目，金额由前面配平。
-        带成本的交易把配平的一条也写出金额（取到分），不然 beancount 按未取整的成本算，余额断言对不上。"""
+        带成本的交易把配平的一条也写出金额（取到分），不然 beancount 按未取整的成本算，余额断言对不上。
+        meta：另外的元数据（车票、门票），字符串加引号，数字原样写。"""
         head = f'{d} * "{payee}" "{narration}"' + "".join(f" #{t}" for t in tags)
         lines = [head]
         if time:
             lines.append(f'  time: "{time}"')
+        for key, value in (meta or {}).items():
+            lines.append(f'  {key}: "{value}"' if isinstance(value, str) else f"  {key}: {value}")
         rest = Decimal(0)
         held = any(len(p) == 4 for p in postings)
         for p in postings:
@@ -342,13 +347,24 @@ def generate(end: date) -> tuple[str, date]:
             book.txn(d, "Steam", "游戏", [("Expenses:Entertainment:Gaming", Decimal("98.00")), ("Assets:Digital:Alipay",)], "22:40")
         if (d.month, d.day) == (5, 1):
             trip = ["hangzhou-trip"]
-            book.txn(d, "铁路12306", "去杭州", [("Expenses:Transport:Train", Decimal("73.00")), ("Assets:Digital:Alipay",)], "07:50", trip)
+            go = {"train": "G1234", "from": "青石", "to": "白沙东", "depart": f"{d} 08:30", "arrive": "09:24", "seat": "二等座 06车09F"}
+            book.txn(d, "铁路12306", "去杭州", [("Expenses:Transport:Train", Decimal("73.00")), ("Assets:Digital:Alipay",)], "07:50", trip, go)
             book.txn(d, "西湖边酒店", "两晚", [("Expenses:Travel:Hotel", Decimal("860.00")), ("Liabilities:CreditCard:CMB:1024",)], "15:00", trip)
             book.txn(d, "知味观", "小笼包", [("Expenses:Food:Meals", Decimal("68.00")), ("Assets:Digital:WeChat",)], "18:30", trip)
+            # 门票提前一天买：一张景区自己卖的，一张平台买的、预约了入园时段，一张退了扣手续费的
+            visit = d + timedelta(days=1)
+            spot = {"attraction": "云栖山风景区", "visit": f"{visit}", "item": "门票 + 上山索道", "tickets": 2}
+            book.txn(d, "云栖山风景区", "门票 2 张", [("Expenses:Travel:Attractions", Decimal("90.00")), ("Assets:Digital:Alipay",)], "20:10", trip, spot)
+            museum = {"attraction": "白沙博物馆", "visit": f"{visit} 14:00", "tickets": 2}
+            book.txn(d, "示例旅行", "博物馆预约 2 张", [("Expenses:Travel:Attractions", Decimal("20.00")), ("Assets:Digital:WeChat",)], "20:30", trip, museum)
+            boat = {"attraction": "镜湖游船", "visit": f"{visit}", "item": "环湖游船", "tickets": 2}
+            book.txn(d, "示例旅行", "镜湖游船 2 张", [("Expenses:Travel:Attractions", Decimal("110.00")), ("Assets:Digital:WeChat",)], "20:40", trip, boat)
+            book.txn(d, "示例旅行", "退镜湖游船", [("Assets:Digital:WeChat", Decimal("99.00")), ("Expenses:Travel:Attractions",)], "22:15", trip, {**boat, "fee": Decimal("11.00")})
         if (d.month, d.day) == (5, 3):
             trip = ["hangzhou-trip"]
             book.txn(d, "茶馆", "龙井", [("Expenses:Social:Gifts", Decimal("268.00")), ("Assets:Digital:WeChat",)], "10:00", trip)
-            book.txn(d, "铁路12306", "回程", [("Expenses:Transport:Train", Decimal("73.00")), ("Assets:Digital:Alipay",)], "17:20", trip)
+            back = {"train": "G1235", "from": "白沙东", "to": "青石", "depart": f"{d} 18:05", "arrive": "19:02"}
+            book.txn(d, "铁路12306", "回程", [("Expenses:Transport:Train", Decimal("73.00")), ("Assets:Digital:Alipay",)], "17:20", trip, back)
         if (d.month, d.day) == (6, 2):
             book.txn(d, "小明", "转来理财", [("Assets:Bank:ICBC:3302", Decimal("5000.00")), ("Liabilities:Custody:Xiaoming",)], "19:00")
             book.txn(d, "", "替小明买余额宝", [("Assets:Custody:Xiaoming:Alipay", Decimal("5000.00")), ("Assets:Bank:ICBC:3302",)], "19:05")

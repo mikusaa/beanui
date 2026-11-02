@@ -239,7 +239,7 @@ class Ledger:
             # 同上两项，带科目和账户徽标，电脑端在名字前画小图标
             "funds": {"sources": [self._fund_json(a) for a in t.sources], "targets": [self._fund_json(a) for a in t.targets]},
             "brand": t.brand.to_json() if t.brand else None,
-            # 写了车票元数据时画成车票；花出去的是负数，金额为正就是退票
+            # 写了车票或门票的元数据时画成票；花出去的是负数，金额为正就是退票
             "ticket": ticket_json(e.meta, refund=t.kind == "expense" and t.amount > 0),
         }
 

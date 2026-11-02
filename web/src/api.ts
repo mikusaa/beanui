@@ -24,8 +24,13 @@ export type TxnSummary = {
   ticket: Ticket | null;
 };
 
-/** 车票，取自交易的元数据。时间是「YYYY-MM-DD HH:MM」；refund：退票，金额是退回的钱；fee：退票或改签的手续费。 */
-export type Ticket = {
+/** 票，取自交易的元数据，kind 分车票和门票。时间是「YYYY-MM-DD HH:MM」；refund：退票，金额是退回的钱；fee：退票或改签的手续费。 */
+export type Ticket = TrainTicket | AttractionTicket;
+
+type TicketCommon = { tickets: number | null; fee: string | null; refund: boolean };
+
+export type TrainTicket = TicketCommon & {
+  kind: "train";
   train: string;
   from: string;
   to: string;
@@ -33,9 +38,14 @@ export type Ticket = {
   arrive: string | null;
   minutes: number | null;
   seat: string | null;
-  tickets: number | null;
-  fee: string | null;
-  refund: boolean;
+};
+
+/** 门票。visit 是入园日期「YYYY-MM-DD」，预约了时段的带开始时刻「YYYY-MM-DD HH:MM」；item 是票种。 */
+export type AttractionTicket = TicketCommon & {
+  kind: "attraction";
+  attraction: string;
+  visit: string;
+  item: string | null;
 };
 
 /** 流水里能显示的指令类型，次序同界面上的开关；open 含销户。 */

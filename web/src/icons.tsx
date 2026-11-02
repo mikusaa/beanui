@@ -29,6 +29,9 @@ const PATHS = {
   file: "M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5",
   // 车票的开车时间
   clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2",
+  // 门票：没有品牌图时的图标，和入园日期
+  ticket: "M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM15 7v2M15 11v2M15 15v2",
+  calendar: "M3 5h18v16H3zM3 10h18M8 3v4M16 3v4",
 };
 
 export type IconName = keyof typeof PATHS;

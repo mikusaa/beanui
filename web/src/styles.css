@@ -41,6 +41,8 @@
   --bad-dot: #d92d20;
   --chart-income: #adc0ff;
   --chart-expense: #344054;
+  --spot-bg: #067647;
+  --spot-fg: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -986,6 +988,17 @@ button {
   outline-offset: -1px;
 }
 
+/* 门票缺图时的实心图标，和 12306 的 logo 一样是整行唯一的饱和色；深色模式也用这个深绿。
+   图标已经是门票，流水行就不再叠分类小标（logo 加载失败退回图标时也一样） */
+.mark-icon {
+  background: var(--spot-bg);
+  color: var(--spot-fg);
+}
+
+.mark-icon + .badge {
+  display: none;
+}
+
 .mark img {
   display: block;
   width: 100%;
@@ -1344,6 +1357,74 @@ button {
 
 .ticket-fee dd.ticket-amount {
   color: var(--green);
+}
+
+/* 门票，对应画布 Phone-Txn-Attraction / Desktop-Journal-Attraction：左边大字景区名，右边浅绿底的副券写入园日期 */
+.ticket-spot-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.desk-pane .ticket-spot-body {
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ticket-spot .ticket-station {
+  line-height: 1.25;
+}
+
+.ticket-stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+.desk-pane .ticket-stub {
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.ticket-stub-day {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.desk-pane .ticket-stub-day {
+  font-size: 22px;
+}
+
+.ticket-stub-note {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.desk-pane .ticket-stub-note {
+  font-size: 12px;
+}
+
+.is-refund .ticket-stub {
+  background: var(--track);
+  color: var(--muted-2);
+}
+
+/* 门票的「已退」章盖在副券左下角，压着撕口，不挡日期 */
+.ticket-spot .ticket-stamp {
+  top: auto;
+  left: -30px;
+  bottom: -18px;
+  transform: rotate(-12deg);
 }
 
 .txn-body .card {

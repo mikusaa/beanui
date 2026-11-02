@@ -8,13 +8,14 @@ import { dayTotal, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, queryTo
 import { Mark } from "./Mark";
 import { navigate } from "./router";
 import { Sheet } from "./Sheet";
-import { TicketCard, ticketLead, ticketTitle } from "./Ticket";
+import { TicketCard, ticketHead, ticketIcon, ticketLead } from "./Ticket";
 import { commitTime, COPY_LABEL, copyText, useTxnDetail } from "./Txn";
 
 const txnPath = (id: string) => `/txn/${encodeURIComponent(id)}`;
 
 function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: string; on: boolean; onPick: (t: TxnSummary) => void }) {
   const amt = txnAmount(t, currency);
+  const head = t.ticket && ticketHead(t, t.ticket);
   const ref = useRef<HTMLAnchorElement>(null);
   // 直接打开 /txn/<id> 时，选中的那笔滚到看得见的地方
   useEffect(() => {
@@ -32,14 +33,15 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
         onPick(t);
       }}
     >
-      <Mark brand={t.brand} fallback={t.payee || t.narration} size={38} radius={11} fontSize={16} />
+      <Mark brand={t.brand} fallback={t.payee || t.narration} size={38} radius={11} fontSize={16} icon={ticketIcon(t.ticket)} />
       <span className="desk-txn-text">
         <span className="desk-txn-title">
           {t.flag === "!" && <span className="flag">待确认</span>}
-          {t.ticket ? (
+          {head ? (
             <>
-              {t.ticket.refund && <span className="refund-tag">退</span>}
-              {t.payee || t.brand?.name} <span className="desk-txn-narration">· {ticketTitle(t.ticket)}</span>
+              {t.ticket?.refund && <span className="refund-tag">退</span>}
+              {head.title}
+              {head.suffix && <span className="desk-txn-narration"> · {head.suffix}</span>}
             </>
           ) : t.payee && t.narration ? (
             <>
@@ -51,9 +53,9 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
         </span>
         <span className="desk-txn-sub">
           {t.ticket ? (
-            // 车票把分类换成开车时间，退票写退票费
-            <span className="desk-tag-cat num" style={{ ["--c" as string]: t.ticket.refund ? "var(--red)" : categoryStyle(t.category?.account).color }}>
-              {!t.ticket.refund && <Icon name="clock" size={13} stroke={2.2} />}
+            // 票把分类换成开车时间或入园日期，退票写退票费；门票用绿色，和门票图标一个色
+            <span className="desk-tag-cat num" style={{ ["--c" as string]: t.ticket.refund ? "var(--red)" : t.ticket.kind === "attraction" ? "var(--spot-bg)" : categoryStyle(t.category?.account).color }}>
+              {!t.ticket.refund && <Icon name={t.ticket.kind === "train" ? "clock" : "calendar"} size={13} stroke={2.2} />}
               {ticketLead(t.ticket)}
             </span>
           ) : (

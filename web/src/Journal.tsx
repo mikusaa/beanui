@@ -8,7 +8,7 @@ import { Mark } from "./Mark";
 import { navigate } from "./router";
 import { Sheet } from "./Sheet";
 import { TabBar } from "./TabBar";
-import { ticketLead, ticketTitle } from "./Ticket";
+import { ticketIcon, ticketLead, ticketTitle } from "./Ticket";
 
 /** shown：流水是底下那一屏（上面可能盖着交易详情）；active：没被盖住；search：地址是 /journal 时的查询串。 */
 export function Journal({ shown, active, search, onToast }: { shown: boolean; active: boolean; search: string | null; onToast: (msg: string) => void }) {
@@ -46,7 +46,7 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
           return (
             <a key={t.id} href={`/txn/${encodeURIComponent(t.id)}`} className="row" onClick={(e) => (e.preventDefault(), open(t))}>
               <span className="row-mark">
-                <Mark brand={t.brand} fallback={t.payee || t.narration} size={40} radius={12} fontSize={16} />
+                <Mark brand={t.brand} fallback={t.payee || t.narration} size={40} radius={12} fontSize={16} icon={ticketIcon(t.ticket)} />
                 <CategoryTile account={t.category?.account} size={20} radius={10} iconSize={11} stroke={2.6} className="badge" />
               </span>
               <span className="row-text">
