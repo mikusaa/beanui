@@ -75,7 +75,7 @@ wheels = [
 
 [[package]]
 name = "beanui"
-version = "0.0.2"
+version = "0.0.3"
 source = { editable = "." }
 dependencies = [
     { name = "beancount" },
