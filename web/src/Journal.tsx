@@ -6,6 +6,7 @@ import { dayLabel, money, subtitle, title, txnAmount } from "./format";
 import { CategoryTile } from "./icons";
 import { dayTotal, DEFAULT_TYPES, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, typeOptions, useJournal } from "./journalState";
 import { Mark } from "./Mark";
+import { NoteTag, NoteText } from "./Note";
 import { navigate } from "./router";
 import { Sheet } from "./Sheet";
 import { TabBar } from "./TabBar";
@@ -24,6 +25,8 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
   });
 
   const [typeSheet, setTypeSheet] = useState(false);
+  // 点开了细节的那一行
+  const [noteOpen, setNoteOpen] = useState<string | null>(null);
   const open = (t: { id: string }) => navigate(`/txn/${encodeURIComponent(t.id)}`);
   // 类型和默认的不一样时，「类型」标签点亮
   const typesChanged = types.join() !== DEFAULT_TYPES.join();
@@ -55,8 +58,10 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
                   {t.flag === "!" && <span className="flag">待确认</span>}
                   {t.ticket?.refund && <span className="refund-tag">退</span>}
                   {t.ticket ? ticketTitle(t.ticket) : title(t)}
+                  {t.note && <NoteTag note={t.note} open={noteOpen === t.id} onToggle={() => setNoteOpen(noteOpen === t.id ? null : t.id)} />}
                 </span>
                 <span className="row-sub">{t.ticket ? subtitle(t, ticketLead(t.ticket)) : subtitle(t)}</span>
+                {t.note && noteOpen === t.id && <NoteText note={t.note} className="row-note" />}
               </span>
               <span className={`num amount tone-${amt.tone}`}>{amt.text}</span>
             </a>

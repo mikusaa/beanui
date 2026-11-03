@@ -920,6 +920,66 @@ button {
   vertical-align: 1px;
 }
 
+/* 细节（note: 元数据）：流水行标题旁的小标记，点开在行里展开；详情里摘要下方的细节 */
+.note-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 1px 4px;
+  border-radius: 5px;
+  background: var(--divider);
+  color: var(--muted-2);
+  vertical-align: -1px;
+  cursor: pointer;
+}
+
+.note-tag:hover,
+.note-tag.is-open {
+  color: var(--ink);
+}
+
+.note-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.note-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.note-block.note-card {
+  margin-top: 0;
+}
+
+.note-block-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-2);
+}
+
+.note-block-text {
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .amount {
   font-weight: 600;
   white-space: nowrap;

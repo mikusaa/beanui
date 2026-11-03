@@ -58,6 +58,14 @@ def test_brands_in_journal(client):
     assert by["十月工资"] is None
 
 
+def test_note_metadata(client):
+    by = {t["narration"]: t["note"] for t in items(client.get("/api/journal").json())}
+    assert by["牛肉饭"] == "公司楼下店，加一份卤蛋，备注不要香菜"
+    assert by["月卡"] == ""
+    tid = next(t["id"] for t in items(client.get("/api/journal").json()) if t["narration"] == "牛肉饭")
+    assert client.get(f"/api/txn/{tid}").json()["note"].startswith("公司楼下店")
+
+
 def test_identical_transactions_get_distinct_ids(client):
     ids = [t["id"] for t in items(client.get("/api/journal").json()) if t["payee"] == "腾讯云"]
     assert len(ids) == 2 and len(set(ids)) == 2

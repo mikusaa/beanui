@@ -50,6 +50,7 @@
   每一页都带，当前筛选下没有时为 `null`。流水页把它显示成最上面一个默认收起的「预记」组。
   每笔交易的 `sources` / `targets` 是出钱和进钱的资金科目的显示名；`funds.sources` / `funds.targets` 是同样的科目，
   带上完整科目名和账户徽标（`{account, name, brand}`）。
+  `note`：交易的 `note:` 元数据（细节，见术语表），没写是空字符串。
   交易写了车票或门票的元数据（写法见 README 的「车票和门票」）时带 `ticket`，否则为 `null`。`kind` 分两种：
   - `"train"`（车票）：`{kind, train, from, to, depart, arrive, minutes, seat, tickets, fee, refund}`。`depart`、`arrive` 是 `YYYY-MM-DD HH:MM`，
     只写了时刻的 `arrive` 补上日期（早于开车时间的算第二天）；`minutes` 是历时，没写 `arrive` 时它和 `arrive` 都是 `null`。

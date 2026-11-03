@@ -4,6 +4,7 @@ import { directiveCopyText, directiveFacts, directiveView, TypeTile } from "./Di
 import { money, shortDate, txnAmount, weekday } from "./format";
 import { CategoryTile, Icon, categoryStyle } from "./icons";
 import { Mark } from "./Mark";
+import { NoteBlock } from "./Note";
 import { TicketCard } from "./Ticket";
 import { goBack, navigate } from "./router";
 import { useDataVersion } from "./sync";
@@ -185,6 +186,7 @@ export function Txn({ id, currency }: { id: string; currency: string }) {
             {txn.ticket ? (
               <section className="hero-ticket">
                 <TicketCard t={txn} ticket={txn.ticket} currency={currency} />
+                {txn.note && <NoteBlock note={txn.note} />}
                 <span className="pills">
                   <span className="pill pill-cat" style={{ ["--c" as string]: categoryStyle(cat?.account).color }}>
                     <Icon name={categoryStyle(cat?.account).icon} size={12} stroke={2.4} />
@@ -225,6 +227,7 @@ export function Txn({ id, currency }: { id: string; currency: string }) {
                 </span>
               </section>
             )}
+            {!txn.ticket && txn.note && <NoteBlock note={txn.note} className="note-card" />}
 
             <section className="card">
               <div className={"card-label" + (txn.balanced ? "" : " is-bad")}>分录 · {txn.balanced ? "已平衡" : "不平衡"}</div>

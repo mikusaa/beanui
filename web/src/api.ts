@@ -12,6 +12,7 @@ export type TxnSummary = {
   flag: string;
   payee: string;
   narration: string;
+  note: string;
   tags: string[];
   kind: Kind;
   amount: string;

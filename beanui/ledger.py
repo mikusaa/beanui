@@ -225,6 +225,8 @@ class Ledger:
             "flag": e.flag,
             "payee": e.payee or "",
             "narration": e.narration or "",
+            # 长细节（地址、收件人、物品清单、订单号等），摘要只写一句
+            "note": str(e.meta.get("note") or ""),
             "tags": sorted(e.tags or ()),
             "kind": t.kind,
             "amount": _fmt(t.amount),

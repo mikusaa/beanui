@@ -7,6 +7,7 @@ import { dayLabel, money, shortDate, txnAmount, weekday } from "./format";
 import { CategoryTile, Icon, categoryStyle } from "./icons";
 import { dayTotal, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, queryToUrl, TYPE_LABELS, useJournal, type FilterKey } from "./journalState";
 import { Mark } from "./Mark";
+import { NoteBlock, NoteTag, NoteText } from "./Note";
 import { navigate } from "./router";
 import { Sheet } from "./Sheet";
 import { TicketCard, ticketHead, ticketIcon, ticketLead } from "./Ticket";
@@ -18,6 +19,7 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
   const amt = txnAmount(t, currency);
   const head = t.ticket && ticketHead(t, t.ticket);
   const ref = useRef<HTMLAnchorElement>(null);
+  const [noteOpen, setNoteOpen] = useState(false);
   // 直接打开 /txn/<id> 时，选中的那笔滚到看得见的地方
   useEffect(() => {
     if (on) ref.current?.scrollIntoView({ block: "nearest" });
@@ -51,6 +53,7 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
           ) : (
             t.payee || t.narration || "（无摘要）"
           )}
+          {t.note && <NoteTag note={t.note} open={noteOpen} onToggle={() => setNoteOpen((o) => !o)} />}
         </span>
         <span className="desk-txn-sub">
           {t.ticket ? (
@@ -64,6 +67,7 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
           )}
           <FundList t={t} />
         </span>
+        {t.note && noteOpen && <NoteText note={t.note} className="desk-row-note" />}
       </span>
       {t.tags.map((tag) => (
         <span key={tag} className="desk-row-tag">
@@ -171,6 +175,7 @@ function TxnPane({ id, currency, onClose, onPick }: { id: string; currency: stri
           {txn.ticket ? (
             <div className="desk-pane-hero">
               <TicketCard t={txn} ticket={txn.ticket} currency={currency} />
+              {txn.note && <NoteBlock note={txn.note} />}
               <span className="num desk-pane-date">
                 {txn.date} {weekday(txn.date)} {txn.ticket.refund ? "退票" : "购票"} · {txn.flag === "!" ? "待确认" : "已确认"} <span className="mono">{txn.flag}</span>
               </span>
@@ -196,6 +201,7 @@ function TxnPane({ id, currency, onClose, onPick }: { id: string; currency: stri
               </span>
             </div>
           )}
+          {!txn.ticket && txn.note && <NoteBlock note={txn.note} className="note-card" />}
 
           <div className="desk-pane-postings">
             <span className={"card-label" + (txn.balanced ? "" : " is-bad")}>分录 · {txn.balanced ? "已平衡" : "不平衡"}</span>
