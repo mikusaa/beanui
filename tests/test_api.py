@@ -105,6 +105,41 @@ def test_filters(client):
     assert count(payee="腾讯云") == 2
 
 
+def test_account_measure(client):
+    """筛一个资金账户时，每笔多写这个账户的变动，合计写它的流入流出；收支口径的字段照旧。"""
+
+    def journal(**params):
+        return client.get("/api/journal", params={"time": "all", **params}).json()
+
+    body = journal(account="Liabilities:Credit:Huabei")
+    assert body["measure"] == {"account": "Liabilities:Credit:Huabei", "name": "花呗", "currency": "CNY", "in": "0.00", "out": "48.42"}
+    assert body["expense"] == "49.50"  # 收支口径不变
+    day = body["days"][0]
+    assert day["change"] == {"in": "0.00", "out": "48.42"}
+    by = {t["narration"]: t for t in day["items"]}
+    assert by["内存条 DDR4"]["amount"] == "-45.00"
+    assert by["内存条 DDR4"]["change"] == {"amount": "-44.02", "currency": "CNY"}
+
+    # 父科目（白条借了又还）：净进出分开记
+    credit = journal(account="Liabilities:Credit:Baitiao")["measure"]
+    assert (credit["in"], credit["out"]) == ("299.00", "299.00")
+    repay = next(t for t in items(journal(account="Liabilities:Credit")) if t["narration"] == "京东白条还款")
+    assert repay["change"] == {"amount": "299.00", "currency": "CNY"}
+
+    # 和分类一起筛也按账户口径；筛分类、筛两个资金账户时不按
+    assert journal(account=["Liabilities:Credit", "Expenses:Tech"])["measure"]["account"] == "Liabilities:Credit"
+    for params in ({"account": "Expenses:Tech"}, {"account": ["Liabilities:Credit", "Assets:Bank"]}, {}):
+        body = journal(**params)
+        assert body["measure"] is None
+        assert all(d["change"] is None for d in body["days"])
+        assert all("change" not in t for t in items(body))
+
+    # 预记组也一样
+    future = journal(account="Liabilities:CreditCard:CMB")["future"]
+    assert future["change"] == {"in": "0.00", "out": "600.00"}
+    assert future["days"][0]["items"][0]["change"] == {"amount": "-300.00", "currency": "CNY"}
+
+
 def test_paging_keeps_day_totals(client):
     first = client.get("/api/journal", params={"limit": 4}).json()
     assert first["next"] == 4

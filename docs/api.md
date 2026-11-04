@@ -51,6 +51,12 @@
   每笔交易的 `sources` / `targets` 是出钱和进钱的资金科目的显示名；`funds.sources` / `funds.targets` 是同样的科目，
   带上完整科目名和账户徽标（`{account, name, brand}`）。
   `note`：交易的 `note:` 元数据（细节，见术语表），没写是空字符串。
+  `account` 里恰好一个资金科目（Assets、Liabilities、Equity 下，可以是父科目；和分类一起筛也算）时按账户口径
+  （见术语表和 ADR 0009）：`measure` 是 `{account, name, currency, in, out}`，`in` / `out` 是这个科目整段的流入、流出
+  （都是正数，每笔按净变动算，只算 `currency`，即这个科目分录里最常见的币种）；每天和 `future` 多一项 `change: {in, out}`；
+  每笔交易多一项 `change: {amount, currency}`，是这个科目（含子科目）在这笔里的净变动，币种取绝对值最大的那条分录的。
+  `amount`、`expense`、`income` 等收支口径的字段照旧。不按账户口径时 `measure`、每天和 `future` 的 `change` 都是 `null`，
+  交易没有 `change`。
   交易写了车票或门票的元数据（写法见 README 的「车票和门票」）时带 `ticket`，否则为 `null`。`kind` 分两种：
   - `"train"`（车票）：`{kind, train, from, to, depart, arrive, minutes, seat, tickets, fee, refund}`。`depart`、`arrive` 是 `YYYY-MM-DD HH:MM`，
     只写了时刻的 `arrive` 补上日期（早于开车时间的算第二天）；`minutes` 是历时，没写 `arrive` 时它和 `arrive` 都是 `null`。

@@ -53,6 +53,14 @@ class Txn:
 
 
 @dataclass
+class Measure:
+    """流水按账户口径时筛的那个资金科目和合计用的币种。"""
+
+    account: str
+    currency: str
+
+
+@dataclass
 class Directive:
     """流水里交易以外的指令：余额断言、开户和销户、备注、价格、文档。"""
 
@@ -384,21 +392,18 @@ class Ledger:
         start, end = parse_time(time, self.today())
         tokens = q.casefold().split()
 
-        def under(account: str, a: str) -> bool:
-            return account == a or account.startswith(a + ":")
-
         out = []
         for r in self.rows:
             e = r.entry
             if start and e.date < start or end and e.date >= end:
                 continue
             if isinstance(r, Txn):
-                if not all(any(under(p.account, a) for p in e.postings) for a in accounts):
+                if not all(any(_under(p.account, a) for p in e.postings) for a in accounts):
                     continue
                 if payee and (e.payee or "") != payee:
                     continue
             else:
-                if accounts and not (r.account and all(under(r.account, a) for a in accounts)):
+                if accounts and not (r.account and all(_under(r.account, a) for a in accounts)):
                     continue
                 if payee:
                     continue
@@ -409,31 +414,59 @@ class Ledger:
             out.append(r)
         return out
 
-    def journal_json(self, rows: list[Row], types=("txn",), offset: int = 0, limit: int = 200) -> dict:
+    def journal_json(
+        self, rows: list[Row], types=("txn",), offset: int = 0, limit: int = 200, accounts: list[str] = ()
+    ) -> dict:
         """按日分组的流水，只列 types 里的类型。日期在今天以后的（预记的分期、订阅）单独放在 future 里一次给全，
         不计入笔数、合计和各类型的条数，也不分页；没有时为 None。
-        count 和合计只算交易，不管交易的开关开没开；types 是筛选后各类型的条数，开关上显示。"""
+        count 和合计只算交易，不管交易的开关开没开；types 是筛选后各类型的条数，开关上显示。
+        accounts 是筛选用的科目；里面恰好一个资金科目时按账户口径，见 _measure_account。"""
         today = self.today()
         past = [r for r in rows if r.entry.date <= today]
         txns = [r for r in past if isinstance(r, Txn)]
         counts = Counter(_type(r) for r in past)
         shown = [r for r in past if _type(r) in types]
         future = [r for r in rows if r.entry.date > today and _type(r) in types]
-        days, totals = self._day_totals(txns)
+        measure = self._measure_account(accounts)
+        days, totals = self._day_totals(txns, measure)
         page = shown[offset : offset + limit]
         return {
             "count": len(txns),
             "currency": self.currency,
             "expense": _fmt(-totals["expense"]),
             "income": _fmt(totals["income"]),
+            "measure": measure
+            and {
+                "account": measure.account,
+                "name": self.account_name(measure.account),
+                "currency": measure.currency,
+                "in": _fmt(totals["in"]),
+                "out": _fmt(-totals["out"]),
+            },
             "types": {t: counts[t] for t in ENTRY_TYPES},
-            "days": self._days_json(page, days),
+            "days": self._days_json(page, days, measure),
             "next": offset + limit if offset + limit < len(shown) else None,
-            "future": self._future_json(future) if future else None,
+            "future": self._future_json(future, measure) if future else None,
         }
 
-    def _future_json(self, rows: list[Row]) -> dict:
-        days, totals = self._day_totals([r for r in rows if isinstance(r, Txn)])
+    def _measure_account(self, accounts: list[str]) -> Measure | None:
+        """筛选里恰好一个资金科目（可以是父科目，如按银行合并的信用卡）时按账户口径：流水写这个科目的进出，
+        方便和账单对（docs/adr/0009）。合计用的币种取这个科目（含子科目）全部分录里最常见的，没有分录时用主货币。"""
+        funds = _unique(a for a in accounts if a.split(":")[0] in FUNDING_ROOTS)
+        if len(funds) != 1:
+            return None
+        account = funds[0]
+        seen = Counter(
+            p.units.currency
+            for r in self.rows
+            if isinstance(r, Txn)
+            for p in r.entry.postings
+            if p.units and p.units.number is not None and _under(p.account, account)
+        )
+        return Measure(account, seen.most_common(1)[0][0] if seen else self.currency)
+
+    def _future_json(self, rows: list[Row], measure: Measure | None = None) -> dict:
+        days, totals = self._day_totals([r for r in rows if isinstance(r, Txn)], measure)
         dates = [r.entry.date for r in rows]
         return {
             "count": len(rows),
@@ -441,31 +474,41 @@ class Ledger:
             "income": _fmt(totals["income"]),
             # 预记的多是分期还款这类转账；没有支出和收入时标题写转账合计，同日合计
             "transfer": _fmt(sum((d["transfer"] for d in days.values()), Decimal(0))),
+            "change": measure and {"in": _fmt(totals["in"]), "out": _fmt(-totals["out"])},
             "first": min(dates).isoformat(),
             "last": max(dates).isoformat(),
-            "days": self._days_json(rows, days),
+            "days": self._days_json(rows, days, measure),
         }
 
-    def _day_totals(self, txns: list[Txn]) -> tuple[dict[date, dict], dict]:
-        """每天的支出、收入、转账和整段的支出、收入，只算主货币。"""
-        totals = {"expense": Decimal(0), "income": Decimal(0)}
+    def _day_totals(self, txns: list[Txn], measure: Measure | None = None) -> tuple[dict[date, dict], dict]:
+        """每天的支出、收入、转账和整段的支出、收入，只算主货币。
+        有 measure 时另算这个账户每笔的净进出（in、out），只算 measure 的币种。"""
+        totals = {"expense": Decimal(0), "income": Decimal(0), "in": Decimal(0), "out": Decimal(0)}
         days: dict[date, dict] = {}
         for t in txns:
-            day = days.setdefault(
-                t.entry.date, {"expense": Decimal(0), "income": Decimal(0), "transfer": Decimal(0)}
-            )
+            day = days.setdefault(t.entry.date, dict.fromkeys(("expense", "income", "transfer", "in", "out"), Decimal(0)))
             if t.currency == self.currency:
                 day[t.kind] += t.amount
                 if t.kind != "transfer":
                     totals[t.kind] += t.amount
+            change = measure and _change(t, measure.account)
+            if change and change[1] == measure.currency:
+                side = "in" if change[0] > 0 else "out"
+                day[side] += change[0]
+                totals[side] += change[0]
         return days, totals
 
-    def _days_json(self, rows: list[Row], days: dict[date, dict]) -> list[dict]:
-        """rows 按日分组；日合计按 days 里的整天算，分页时跨页的那天也一样。只有其他指令的那天合计为零。"""
+    def _days_json(self, rows: list[Row], days: dict[date, dict], measure: Measure | None = None) -> list[dict]:
+        """rows 按日分组；日合计按 days 里的整天算，分页时跨页的那天也一样。只有其他指令的那天合计为零。
+        有 measure 时交易多一项 change（这个账户在这笔里的净变动），每天多一项 change（流入、流出）。"""
         grouped: dict[date, list] = defaultdict(list)
         for r in rows:
-            grouped[r.entry.date].append(self.row_json(r))
-        zero = {"expense": Decimal(0), "income": Decimal(0), "transfer": Decimal(0)}
+            row = self.row_json(r)
+            if measure and isinstance(r, Txn):
+                change = _change(r, measure.account)
+                row["change"] = change and {"amount": _fmt(change[0]), "currency": change[1]}
+            grouped[r.entry.date].append(row)
+        zero = dict.fromkeys(("expense", "income", "transfer", "in", "out"), Decimal(0))
         return [
             {
                 "date": d.isoformat(),
@@ -473,6 +516,7 @@ class Ledger:
                 "expense": _fmt(-days.get(d, zero)["expense"]),
                 "income": _fmt(days.get(d, zero)["income"]),
                 "transfer": _fmt(days.get(d, zero)["transfer"]),
+                "change": measure and {"in": _fmt(days.get(d, zero)["in"]), "out": _fmt(-days.get(d, zero)["out"])},
                 "items": items,
             }
             for d, items in grouped.items()
@@ -581,6 +625,19 @@ def _group(account: str) -> str:
 
 def _unique(items) -> list:
     return list(dict.fromkeys(items))
+
+
+def _under(account: str, parent: str) -> bool:
+    return account == parent or account.startswith(parent + ":")
+
+
+def _change(t: Txn, account: str) -> tuple[Decimal, str] | None:
+    """这笔交易里 account（含子科目）的净变动：币种取绝对值最大的那条分录的，只加这个币种的分录。"""
+    ps = [p for p in t.entry.postings if p.units and p.units.number is not None and _under(p.account, account)]
+    if not ps:
+        return None
+    currency = max(ps, key=lambda p: abs(p.units.number)).units.currency
+    return sum((p.units.number for p in ps if p.units.currency == currency), Decimal(0)), currency
 
 
 def _git_root(start: Path) -> Path | None:

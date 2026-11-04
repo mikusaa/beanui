@@ -44,6 +44,19 @@ export function txnAmount(t: Pick<TxnSummary, "kind" | "amount" | "currency">, o
   return { text: t.currency === operating ? text : `${text} ${t.currency}`, tone };
 }
 
+/** 流水行上的金额。按账户口径时写筛的那个资金科目的变动（带正负号），和收支口径的金额不一样时，
+ *  own 写收支口径的那个数，如「支出 482.50」：平摊时是自己那份，有优惠时是原价。 */
+export function rowAmount(t: Pick<TxnSummary, "kind" | "amount" | "currency" | "change">, operating: string) {
+  const c = t.change;
+  if (!c) return { ...txnAmount(t, operating), own: null };
+  const text = money(c.amount, "always");
+  const tone: Kind = t.kind === "transfer" ? "transfer" : Number(c.amount) > 0 ? "income" : "expense";
+  const same = c.currency === t.currency && Number(c.amount) === Number(t.amount);
+  const label = t.kind === "income" ? "收入" : Number(t.amount) > 0 ? "退款" : "支出";
+  const own = t.kind === "transfer" || same ? null : `${label} ${money(t.amount, "none")}${t.currency === operating ? "" : ` ${t.currency}`}`;
+  return { text: c.currency === operating ? text : `${text} ${c.currency}`, tone, own };
+}
+
 export function title(t: Pick<TxnSummary, "payee" | "narration">): string {
   return [t.payee, t.narration].filter(Boolean).join(" · ") || "（无摘要）";
 }

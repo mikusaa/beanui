@@ -2,9 +2,9 @@ import { useRef, useState } from "react";
 import type { Day, EntryType, TxnSummary } from "./api";
 import { CategorySheet } from "./CategorySheet";
 import { DirectiveRow } from "./Directive";
-import { dayLabel, money, subtitle, title, txnAmount } from "./format";
+import { dayLabel, rowAmount, subtitle, title } from "./format";
 import { CategoryTile } from "./icons";
-import { dayTotal, DEFAULT_TYPES, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, typeOptions, useJournal } from "./journalState";
+import { dayTotal, DEFAULT_TYPES, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, journalSummary, typeOptions, useJournal } from "./journalState";
 import { Mark } from "./Mark";
 import { NoteTag, NoteText } from "./Note";
 import { navigate } from "./router";
@@ -46,7 +46,7 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
         {d.items.map((e) => {
           if (e.type !== "txn") return <DirectiveRow key={e.id} d={e} currency={currency} onOpen={open} />;
           const t: TxnSummary = e;
-          const amt = txnAmount(t, currency);
+          const amt = rowAmount(t, currency);
           return (
             <a key={t.id} href={`/txn/${encodeURIComponent(t.id)}`} className="row" onClick={(e) => (e.preventDefault(), open(t))}>
               <span className="row-mark">
@@ -63,7 +63,14 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
                 <span className="row-sub">{t.ticket ? subtitle(t, ticketLead(t.ticket)) : subtitle(t)}</span>
                 {t.note && noteOpen === t.id && <NoteText note={t.note} className="row-note" />}
               </span>
-              <span className={`num amount tone-${amt.tone}`}>{amt.text}</span>
+              {amt.own ? (
+                <span className="row-amount">
+                  <span className={`num amount tone-${amt.tone}`}>{amt.text}</span>
+                  <span className="num amount-own">{amt.own}</span>
+                </span>
+              ) : (
+                <span className={`num amount tone-${amt.tone}`}>{amt.text}</span>
+              )}
             </a>
           );
         })}
@@ -93,7 +100,7 @@ export function Journal({ shown, active, search, onToast }: { shown: boolean; ac
           </button>
         </div>
         <span className="num summary">
-          {data ? `${data.count.toLocaleString("en-US")} 条 · 支出 ¥${money(data.expense)} · 收入 ¥${money(data.income)}` : " "}
+          {data ? journalSummary(data) : " "}
         </span>
       </header>
 

@@ -62,7 +62,7 @@ def create_app(
             rows = ledger.filter(time=time, q=q, accounts=account, tag=tag, payee=payee)
         except ValueError as err:
             raise HTTPException(400, str(err)) from err
-        return ledger.journal_json(rows, types=type, offset=offset, limit=limit)
+        return ledger.journal_json(rows, types=type, offset=offset, limit=limit, accounts=account)
 
     @app.get("/api/txn/{tid}")
     def txn(tid: str):

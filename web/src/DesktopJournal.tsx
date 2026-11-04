@@ -3,9 +3,9 @@ import { ENTRY_TYPES, type Day, type TxnSummary } from "./api";
 import { CategorySheet } from "./CategorySheet";
 import { CategoryTag, DeskPage, FundList } from "./DeskPage";
 import { DeskDirectiveRow, directiveFacts, directiveView } from "./Directive";
-import { dayLabel, money, shortDate, txnAmount, weekday } from "./format";
+import { dayLabel, money, rowAmount, shortDate, txnAmount, weekday } from "./format";
 import { CategoryTile, Icon, categoryStyle } from "./icons";
-import { dayTotal, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, queryToUrl, TYPE_LABELS, useJournal, type FilterKey } from "./journalState";
+import { dayTotal, FILTER_KEYS, FILTER_TITLES, futureLabel, futureTotal, journalSummary, queryToUrl, TYPE_LABELS, useJournal, type FilterKey } from "./journalState";
 import { Mark } from "./Mark";
 import { NoteBlock, NoteTag, NoteText } from "./Note";
 import { navigate } from "./router";
@@ -16,7 +16,7 @@ import { commitTime, COPY_LABEL, copyText, useTxnDetail } from "./Txn";
 const txnPath = (id: string) => `/txn/${encodeURIComponent(id)}`;
 
 function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: string; on: boolean; onPick: (t: TxnSummary) => void }) {
-  const amt = txnAmount(t, currency);
+  const amt = rowAmount(t, currency);
   const head = t.ticket && ticketHead(t, t.ticket);
   const ref = useRef<HTMLAnchorElement>(null);
   const [noteOpen, setNoteOpen] = useState(false);
@@ -74,7 +74,14 @@ function JournalRow({ t, currency, on, onPick }: { t: TxnSummary; currency: stri
           #{tag}
         </span>
       ))}
-      <span className={`num amount desk-row-amount tone-${amt.tone}`}>{amt.text}</span>
+      {amt.own ? (
+        <span className="row-amount desk-row-amount">
+          <span className={`num amount tone-${amt.tone}`}>{amt.text}</span>
+          <span className="num amount-own">{amt.own}</span>
+        </span>
+      ) : (
+        <span className={`num amount desk-row-amount tone-${amt.tone}`}>{amt.text}</span>
+      )}
     </a>
   );
 }
@@ -352,7 +359,7 @@ export function DesktopJournal({
       shown={shown}
       active={active}
       title="流水"
-      subtitle={data ? `${chipLabel("time")} · ${data.count.toLocaleString("en-US")} 条 · 支出 ¥${money(data.expense)} · 收入 ¥${money(data.income)}` : " "}
+      subtitle={data ? `${chipLabel("time")} · ${journalSummary(data)}` : " "}
       actions={<div className="desk-filters">{FILTER_KEYS.map(filterButton)}</div>}
       bodyRef={bodyRef}
       onScroll={onScroll}

@@ -23,7 +23,12 @@ export type TxnSummary = {
   funds: { sources: Fund[]; targets: Fund[] };
   brand: Brand | null;
   ticket: Ticket | null;
+  /** 只在流水按账户口径时有：筛的那个资金科目（含子科目）在这笔里的净变动。 */
+  change?: { amount: string; currency: string } | null;
 };
+
+/** 按账户口径时，筛的那个资金科目的流入和流出（都写正数，只算 Journal.measure 的币种）；不按时为 null。 */
+export type Change = { in: string; out: string } | null;
 
 /** 票，取自交易的元数据，kind 分车票和门票。时间是「YYYY-MM-DD HH:MM」；refund：退票，金额是退回的钱；fee：退票或改签的手续费。 */
 export type Ticket = TrainTicket | AttractionTicket;
@@ -72,6 +77,7 @@ export type Day = {
   expense: string;
   income: string;
   transfer: string;
+  change: Change;
   items: Entry[];
 };
 
@@ -81,6 +87,7 @@ export type FutureGroup = {
   expense: string;
   income: string;
   transfer: string;
+  change: Change;
   first: string;
   last: string;
   days: Day[];
@@ -91,6 +98,8 @@ export type Journal = {
   currency: string;
   expense: string;
   income: string;
+  /** 筛选里恰好一个资金科目时按账户口径：行上和合计写这个科目的进出，见 docs/adr/0009。 */
+  measure: { account: string; name: string; currency: string; in: string; out: string } | null;
   /** 筛选后各类型的条数（不含预记），不管开关开没开。 */
   types: Record<EntryType, number>;
   days: Day[];

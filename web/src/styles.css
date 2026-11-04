@@ -985,6 +985,21 @@ button {
   white-space: nowrap;
 }
 
+/* 按账户口径时，金额下面写收支口径的那个数（平摊时自己那份、有优惠时原价） */
+.row-amount {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.amount-own {
+  font-size: 12px;
+  color: var(--muted-2);
+  white-space: nowrap;
+}
+
 .tone-expense {
   color: var(--ink);
 }

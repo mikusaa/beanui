@@ -74,7 +74,13 @@ function mergeDays(a: Day[], b: Day[]): Day[] {
   return [...a.slice(0, -1), { ...last, items: [...last.items, ...b[0].items] }, ...b.slice(1)];
 }
 
-export function dayTotal(d: Pick<Day, "expense" | "income" | "transfer">): string {
+/** 按账户口径时的「流出 X · 流入 Y」，为零的不写。 */
+function changeTotal(c: { in: string; out: string }): string {
+  return [Number(c.out) && `流出 ${money(c.out)}`, Number(c.in) && `流入 ${money(c.in)}`].filter(Boolean).join(" · ");
+}
+
+export function dayTotal(d: Pick<Day, "expense" | "income" | "transfer" | "change">): string {
+  if (d.change) return changeTotal(d.change);
   const parts = [];
   if (Number(d.expense)) parts.push(`支出 ${money(d.expense)}`);
   if (Number(d.income)) parts.push(`收入 ${money(d.income)}`);
@@ -84,6 +90,7 @@ export function dayTotal(d: Pick<Day, "expense" | "income" | "transfer">): strin
 
 /** 预记组标题的合计：不像日分组那样只在没有收支时才写转账，不为零的都写，分期出账才看得见 */
 export function futureTotal(f: FutureGroup): string {
+  if (f.change) return changeTotal(f.change);
   return [
     Number(f.expense) && `支出 ${money(f.expense)}`,
     Number(f.income) && `收入 ${money(f.income)}`,
@@ -91,6 +98,15 @@ export function futureTotal(f: FutureGroup): string {
   ]
     .filter(Boolean)
     .join(" · ");
+}
+
+/** 流水头上的「128 条 · 支出 ¥… · 收入 ¥…」；按账户口径时换成这个账户的流出、流入，币种不是主货币时写在后面。 */
+export function journalSummary(j: Journal): string {
+  const count = `${j.count.toLocaleString("en-US")} 条`;
+  const m = j.measure;
+  if (!m) return `${count} · 支出 ¥${money(j.expense)} · 收入 ¥${money(j.income)}`;
+  const amt = (v: string) => (m.currency === j.currency ? `¥${money(v)}` : `${money(v)} ${m.currency}`);
+  return `${count} · 流出 ${amt(m.out)} · 流入 ${amt(m.in)}`;
 }
 
 /** 预记组标题里日期以外的部分：「28 笔 · 最晚 2027-09-28」；合计另用 futureTotal。 */
